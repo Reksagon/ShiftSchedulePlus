@@ -1,6 +1,5 @@
 package com.korniienko.scheduleplus.ui.calendar;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -14,17 +13,38 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.korniienko.scheduleplus.BlankViewModel;
 import com.korniienko.scheduleplus.databinding.CalendarFragmentBinding;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class CalendarKD extends Fragment {
 
     private CalendarViewModel mViewModel;
     CalendarFragmentBinding binding;
     TextView[] days;
-    Calendar calendar = Calendar.getInstance();
+    Calendar calendar;
+    public int m, y;
+
+    public static CalendarKD newInstance(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, date.getMonth());
+        calendar.set(Calendar.YEAR, date.getYear());
+        return new CalendarKD(calendar);
+    }
+
+    public static CalendarKD newInstance(Date date, int month) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MONTH, date.getMonth());
+        calendar.set(Calendar.YEAR, date.getYear());
+        calendar.add(Calendar.MONTH, month);
+        return new CalendarKD(calendar);
+    }
+
+    public CalendarKD(Calendar calendar)
+    {
+        this.calendar = calendar;
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -34,7 +54,17 @@ public class CalendarKD extends Fragment {
         View root = binding.getRoot();
         findDays();
         setDays();
+        m = calendar.get(Calendar.MONTH);
+        y = calendar.get(Calendar.YEAR);
         return root;
+    }
+
+    public void setCalendar(Calendar calendar) {
+        this.calendar = calendar;
+    }
+
+    public Calendar getCalendar() {
+        return calendar;
     }
 
     void findDays()
@@ -56,7 +86,7 @@ public class CalendarKD extends Fragment {
         switch(calendar.get(Calendar.DAY_OF_WEEK))
         {
             case 1:
-                setCalendar(0, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+                setCalendar(7 , calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
                 break;
             case 2:
                 setCalendar(1, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -98,6 +128,7 @@ public class CalendarKD extends Fragment {
             days[ii].setText(String.valueOf(prev_month_day));
             days[ii].setAlpha(0.5f);
         }
+
     }
 
 }
