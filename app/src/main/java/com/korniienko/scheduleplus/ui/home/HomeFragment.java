@@ -36,61 +36,38 @@ public class HomeFragment extends Fragment {
         View root = binding.getRoot();
 
 
-        calendarStateAdapter = new CalendarStateAdapter(getActivity());
+        calendarStateAdapter = new CalendarStateAdapter(getActivity().getSupportFragmentManager(), getLifecycle());
         calendarStateAdapter.feedsList = new ArrayList<>();
 
         setFeedList();
 
 
         binding.viewPager.setAdapter(calendarStateAdapter);
-        binding.viewPager.setCurrentItem(3);
+        binding.viewPager.setCurrentItem(24, false);
+
         binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
 
-            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onPageSelected(int position) {
+
                 Date date = calendarStateAdapter.feedsList.get(position);
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(setTitle(date.getMonth(), date.getYear()));
                 if (position == calendarStateAdapter.feedsList.size() - 2) {
 
-                    calendarStateAdapter
-                            .feedsList
-                            .add(new Date(date.getYear(), date.getMonth() + 2, 1));
-
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            calendarStateAdapter.notifyDataSetChanged();
-                        }
-                    }, 100);
-
-
+                    calendarStateAdapter.AddEnd(new Date(date.getYear(), date.getMonth() + 2, 1));
                 }
-                if (position == 1) {
-                    calendarStateAdapter
-                            .feedsList
-                            .add(0, new Date(date.getYear(), date.getMonth() - 2, 1));
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            calendarStateAdapter.notifyDataSetChanged();
-                            binding.viewPager.setCurrentItem(1);
-                        }
-                    }, 100);
-                    date = calendarStateAdapter.feedsList.get(1);
-                }
-                if(position == 0) {
-                    //binding.viewPager.setCurrentItem(1);
-                    //calendarStateAdapter.notifyItemChanged(1);
-                    date = calendarStateAdapter.feedsList.get(1);
-                }
+//                if (position == 1) {
+//                    calendarStateAdapter.AddBegin(new Date(date.getYear(), date.getMonth() - 2, 1));
+//                }
+//                if(position == 0) {
+//                    binding.viewPager.setCurrentItem(1);
+//                    date = calendarStateAdapter.feedsList.get(1);
+//                }
 
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(setTitle(date.getMonth(), date.getYear()));
             }
             @Override
             public void onPageScrollStateChanged(int state) {
@@ -140,9 +117,10 @@ public class HomeFragment extends Fragment {
     {
         Calendar calendar = Calendar.getInstance();
         Date date = new Date(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), 1);
-        setFeedListMonth(new Date(date.getYear(), date.getMonth() - 3, 1));
-        setFeedListMonth(new Date(date.getYear(), date.getMonth() - 2, 1));
-        setFeedListMonth(new Date(date.getYear(), date.getMonth() - 1, 1));
+        for(int i = 24; i >= 1; i--)
+        {
+            setFeedListMonth(new Date(date.getYear(), date.getMonth() - i, 1));
+        }
         setFeedListMonth(new Date(date.getYear(), date.getMonth(), 1));
         setFeedListMonth(new Date(date.getYear(), date.getMonth() + 1, 1));
         setFeedListMonth(new Date(date.getYear(), date.getMonth() + 2, 1));
@@ -159,7 +137,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Date date = calendarStateAdapter.feedsList.get(3);
+        Date date = calendarStateAdapter.feedsList.get(24);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(setTitle(date.getMonth(), date.getYear()));
     }
 
